@@ -1,0 +1,42 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content=""><title>TCP到底做了什么 | 诗酒趁年华</title><link rel="stylesheet" type="text/css" href="/Janeiojbk.github.io/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.4.0/jquery.min.js"></script><link rel="icon" mask="" sizes="any" href="/Janeiojbk.github.io/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/Janeiojbk.github.io/favicon.ico"><link rel="apple-touch-icon" href="/Janeiojbk.github.io/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/Janeiojbk.github.io/apple-touch-icon.png"><meta name="generator" content="Hexo 4.2.0"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">TCP到底做了什么</h1><a id="logo" href="/Janeiojbk.github.io/.">诗酒趁年华</a><p class="description">Janei 's blog</p></div><div id="nav-menu"><a class="current" href="/Janeiojbk.github.io/."><i class="fa fa-home"> 首页</i></a><a href="/Janeiojbk.github.io/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/Janeiojbk.github.io/about/"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">TCP到底做了什么</h1><div class="post-meta">Feb 29, 2020</div><div class="post-content"><h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0 前言"></a>0 前言</h2><p>这篇博客是对TCP的一个总结，算是对TCP设计思路的一个总结。</p>
+<h2 id="1-TCP的目标"><a href="#1-TCP的目标" class="headerlink" title="1 TCP的目标"></a>1 TCP的目标</h2><p>传输层运行在网络层之上，网络层的IP协议提供的是不可靠、无连接的服务。</p>
+<p>不可靠的意思是网络层不保证数据包一定能无错地到达目标机器，比如当一个路由器的缓冲区用完之后，再来的数据包都会被路由器丢弃。</p>
+<p>无连接的意思是IP协议不会去维护数据报的状态，也就是说每个数据报都是独立的，如果发送方先发了A，再发B，那么接收方有可能先收到B、再收到A。</p>
+<p>TCP的目标就是运行在不可靠且无连接的服务上，提供尽可能快的、可靠的、面向连接的字节流服务。TCP所做的一切都是为了这三个目标，接下来我们将对这三个目标分别进行讨论。</p>
+<p>当然，除此之外，TCP还要完成传输层应有的责任，比如将应用层发来的数据包分段，以适应网络层的最大大小，为了让数据包知道发送和接收方的应用，提供寻址端口信息等。</p>
+<h2 id="2-TCP的可靠性"><a href="#2-TCP的可靠性" class="headerlink" title="2 TCP的可靠性"></a>2 TCP的可靠性</h2><h3 id="2-1-差错控制"><a href="#2-1-差错控制" class="headerlink" title="2.1 差错控制"></a>2.1 差错控制</h3><ol>
+<li>检错码</li>
+<li>自动重复请求</li>
+<li>停等协议</li>
+<li>滑动窗口</li>
+</ol>
+<h3 id="2-2-确认"><a href="#2-2-确认" class="headerlink" title="2.2 确认"></a>2.2 确认</h3><h3 id="2-3-流量控制"><a href="#2-3-流量控制" class="headerlink" title="2.3 流量控制"></a>2.3 流量控制</h3><h2 id="3-TCP的高效性"><a href="#3-TCP的高效性" class="headerlink" title="3 TCP的高效性"></a>3 TCP的高效性</h2><h3 id="3-1-拥塞控制"><a href="#3-1-拥塞控制" class="headerlink" title="3.1 拥塞控制"></a>3.1 拥塞控制</h3><p>拥塞会造成丢包，网络性能会急剧下降。所以要避免拥塞</p>
+<p>首先发送端要知道网络正在经历拥塞，有两种方法</p>
+<ol>
+<li>显示拥塞通知</li>
+<li>丢包检测</li>
+</ol>
+<p>控制方法</p>
+<p>加法递增乘法递减</p>
+<p>快速重传</p>
+<p>快速恢复</p>
+<h2 id="4-TCP的面向连接"><a href="#4-TCP的面向连接" class="headerlink" title="4 TCP的面向连接"></a>4 TCP的面向连接</h2><p>建立连接的方法看起来似乎很简单，A告诉B我要开始传了，B说ok，我也要开始传了，A说ok，连接就建立了。但厚厚的计网书告诉我绝没这么简单。</p>
+<p>延迟重复，银行汇款，数据包重复到达</p>
+<p>多次连接，重复连接问题</p>
+<p>解决方法</p>
+<p>1 消除重复连接本身</p>
+<ol>
+<li>连接标识符</li>
+<li>一次性传输地址</li>
+</ol>
+<p>1会额外占用资源，重启后失效，2没啥卵用</p>
+<p>这时提出想法，可以使用序号来判断数据包是否过时</p>
+<p>序号可能会回转</p>
+<p>好解决，给数据包生存周期，在生存周期内不回转就行了</p>
+<p>所以建立连接时要交换序号</p>
+<p>你给我，我给你，二次握手，行吗</p>
+<p>这样看上去很合理，Y收到了X的连接请求和序号，为他打开一个连接并把自己的序号告诉X，然后完成连接建立的过程。</p>
+<p>但由于接收方不会记录发送方的序号，如果X的这个请求是旧的请求，那么Y会仍然打开一个连接，三次握手的话，X就会在第三次拒绝掉这个连接。</p>
+<p>这里有同学会问了，两次握手除了以上情况，还有可能造成第二次的丢失，事实上第二次不可能丢失的，因为主机1在收不到确认的情况下，会重传连接请求！</p>
+<p>TIME_WAIT，防止最后一个确认丢失，防止旧数据包影响新连接</p>
+</div><div class="tags"><a href="/Janeiojbk.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></div><div class="post-nav"><a class="pre" href="/Janeiojbk.github.io/2020/03/09/%E9%9D%A2%E8%AF%95%E9%97%AE%E9%A2%98%E6%95%B4%E7%90%86/">面试问题整理</a><a class="next" href="/Janeiojbk.github.io/2020/02/28/%E6%80%9D%E5%89%8D%E6%83%B3%E5%90%8E%EF%BC%8C%E4%B8%8D%E5%A6%82%E4%B8%8D%E7%AE%A1%E4%B8%8D%E9%A1%BE/">思前想后，不如不管不顾</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://Janeiojbk.github.io"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/Janeiojbk.github.io/categories/%E9%9A%8F%E7%AC%94/">随笔</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/Janeiojbk.github.io/tags/%E6%84%9F%E6%82%9F/" style="font-size: 15px;">感悟</a> <a href="/Janeiojbk.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 15px;">计算机网络</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/Janeiojbk.github.io/2020/03/09/%E9%9D%A2%E8%AF%95%E9%97%AE%E9%A2%98%E6%95%B4%E7%90%86/">面试问题整理</a></li><li class="post-list-item"><a class="post-list-link" href="/Janeiojbk.github.io/2020/02/29/TCP%E5%88%B0%E5%BA%95%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/">TCP到底做了什么</a></li><li class="post-list-item"><a class="post-list-link" href="/Janeiojbk.github.io/2020/02/28/%E6%80%9D%E5%89%8D%E6%83%B3%E5%90%8E%EF%BC%8C%E4%B8%8D%E5%A6%82%E4%B8%8D%E7%AE%A1%E4%B8%8D%E9%A1%BE/">思前想后，不如不管不顾</a></li><li class="post-list-item"><a class="post-list-link" href="/Janeiojbk.github.io/2020/02/28/%E5%86%99%E5%8D%9A%E5%AE%A2%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/">写博客的重要性</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="https://google.com/" title="Google" target="_blank">Google</a><ul></ul><a href="https://stackoverflow.com/" title="StackOverflow" target="_blank">StackOverflow</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2020 <a href="/Janeiojbk.github.io/." rel="nofollow">诗酒趁年华.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/Janeiojbk.github.io/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/Janeiojbk.github.io/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css"><script type="text/javascript" src="/Janeiojbk.github.io/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/Janeiojbk.github.io/js/smartresize.js?v=0.0.0"></script></div></body></html>

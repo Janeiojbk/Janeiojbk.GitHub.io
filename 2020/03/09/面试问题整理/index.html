@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content=""><title>面试问题整理 | 诗酒趁年华</title><link rel="stylesheet" type="text/css" href="/Janeiojbk.github.io/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.4.0/jquery.min.js"></script><link rel="icon" mask="" sizes="any" href="/Janeiojbk.github.io/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/Janeiojbk.github.io/favicon.ico"><link rel="apple-touch-icon" href="/Janeiojbk.github.io/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/Janeiojbk.github.io/apple-touch-icon.png"><meta name="generator" content="Hexo 4.2.0"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">面试问题整理</h1><a id="logo" href="/Janeiojbk.github.io/.">诗酒趁年华</a><p class="description">Janei 's blog</p></div><div id="nav-menu"><a class="current" href="/Janeiojbk.github.io/."><i class="fa fa-home"> 首页</i></a><a href="/Janeiojbk.github.io/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/Janeiojbk.github.io/about/"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">面试问题整理</h1><div class="post-meta">Mar 9, 2020</div><div class="post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>整理一些关于C++后端的面试常见问题</p>
+<h2 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h2><ol>
+<li>进程和线程的区别</li>
+</ol>
+<p>进程是资源分配的最小单位，线程是调度的最小单位。进程拥有自己独立的地址空间，线程使用进程的地址空间，但不与线程共享寄存器和栈。两者相对而言，进程更加重量级，启动一个进程比启动一个线程要耗费更多的资源，但好处是进程间是独立的，有安全性和鲁棒性。而线程的启动则不需要太多资源，但如果一个线程崩了，整个进程都会崩溃。</p>
+<ol start="2">
+<li>多进程和多线程的优缺点</li>
+</ol>
+<p>多进程的优点是内存隔离，单个进程的崩溃不会影响其他进程，而且编程比较容易，缺点是进程调用、通信和切换开销要大，适用于子功能交互少，安全性要求高的目标</p>
+<p>多线程的优点是开销小、线程间通信比较方便，但是没有内存隔离，共享进程的地址空间，安全性较差，也不容易编程，适合存在大量IO和简单任务的目标</p>
+<ol start="3">
+<li>进程间通信</li>
+</ol>
+<p>管道、命名管道、消息队列、共享内存、信号、信号量、套接字</p>
+<p>4 虚拟内存</p>
+<p>虚拟内存将主存作为磁盘的缓冲，为进程提供了连续、一致且隔离的地址空间、他使得每一个进程地址空间相互隔离并且很大</p>
+<p>5 锁</p>
+<p>互斥锁 mutex：<br>在访问共享资源之前对进行加锁操作，在访问完成之后进行解锁操作。<br>加锁后，任何其他试图再次加锁的线程会被阻塞，直到当前进程解锁。<br>如果解锁时有一个以上的线程阻塞，那么所有该锁上的线程都被编程就绪状态，<br>第一个变为就绪状态的线程又执行加锁操作，那么其他的线程又会进入等待。<br>在这种方式下，只有一个线程能够访问被互斥锁保护的资源。</p>
+<p>读写锁 rwlock（也叫作共享互斥锁：读模式共享，写模式互斥）：<br>读写锁有三种状态：读加锁状态、写加锁状态和不加锁状态<br>一次只有一个线程可以占有写模式的读写锁，但是多个线程可以同时占有读模式的读写锁。（这也是它能够实现高并发的一种手段）<br>当读写锁在写加锁模式下，任何试图对这个锁进行加锁的线程都会被阻塞，直到写进程对其解锁。<br>当读写锁在读加锁模式先，任何线程都可以对其进行读加锁操作，但是所有试图进行写加锁操作的线程都会被阻塞，直到所有的读线程都解锁。<br>所以读写锁非常适合对数据结构读的次数远远大于写的情况。</p>
+<p>如果严格按照上述读写锁的操作进行的话，那么当读者源源不断到来的时候，写者总是得不到读写锁，就会造成不公平的状态。<br>一种避免这种不公平状态的方法是：<br>当处于读模式的读写锁接收到一个试图对其进行写模式加锁操作时，便会阻塞后面对其进行读模式加锁操作的线程。<br>这样等到已经加读模式的锁解锁后，写进程能够访问此锁保护的资源。</p>
+<p>自旋锁spinlock：<br>自旋锁的使用模式和互斥锁很类似。<br>只是在加锁后，有线程试图再次执行加锁操作的时候，该线程不会阻塞，而处于循环等待的忙等状态（CPU不能够做其他事情）。<br>所以自旋锁适用的情况是：锁被持有的时间较短，而且进程并不希望在重新调度上花费太多的成本。</p>
+<p>6 </p>
+<h2 id="计算机网络"><a href="#计算机网络" class="headerlink" title="计算机网络"></a>计算机网络</h2><p>1 TCP三次握手</p>
+<p>首先连接方随机挑选一个序号发给服务器，服务器接收到后发送ack，再将自己的seq发给客户端，客户端回ack</p>
+<p>2 为什么三次</p>
+<p>防止重复的连接请求再打开连接，浪费资源（如果是重复的会回应reject</p>
+<p>3 time wait</p>
+<p>连接房收到服务端的fin后会等待2MSL（报文最大生存时间）再关闭连接，原因是防止服务端未收到ack或滞留的数据包影响下一次连接</p>
+<p>4 滑动窗口</p>
+<p>滑动窗口是一种流量控制技术，用于改善停等协议带来的低带宽利用率，主要思想是有一个发送窗口和一个接收窗口，发送方发送一个报文后如果发送窗口仍有空闲可以缓冲这个报文直接发送下一个，等接收方确认后释放这个空间</p>
+<p>5 拥塞控制和流量控制</p>
+<p>发送窗口 = min (接收窗口， 拥塞窗口)</p>
+<h2 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h2><ol>
+<li>malloc的原理</li>
+</ol>
+<p>从内存池（链表）中找足够大的，找不到整理一下</p>
+<ol start="2">
+<li>多态实现</li>
+</ol>
+<p>动态绑定、虚函数</p>
+<ol start="3">
+<li>虚函数实现</li>
+</ol>
+<p>每个类有一个虚函数表，类实例的第一个成员是vptr，虚函数表指针</p>
+<p>调用虚函数时等价于*vptr[1]</p>
+<p><img src="./images/virtual.png" alt="a"></p>
+<p>4 什么是循环引用，weak_ptr为什么可以解决循环引用</p>
+<p>两个对象互相保持有对方的shared_ptr会造成双方永远不会释放</p>
+<p>弱引用不影响内存管理，但可以检查当前对象是否仍存在</p>
+<h2 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h2><p>1 事务四大特性</p>
+<p>ACID</p>
+<p>原子性：每个事务中的操作要么一起完成，要么一起不完成</p>
+<p>一致性：数据库的状态从一种一致性的状态转移到另一种一致性的状态</p>
+<p>一致性是程序员管理的，数据库为之提供便利</p>
+<p>隔离性：多个事务并发执行不会互相干扰</p>
+<p>持久性：事务一旦提交，更新就应该是永久的</p>
+<p>2 数据库隔离级别</p>
+<p>读未提交：可以读取尚未提交的事务数据，会出现脏读、不可重复读和幻读</p>
+<p>读提交：不可重复读和幻读</p>
+<p>可重复读：幻读</p>
+<p>序列化：无</p>
+<p>脏读：脏读是指在一个事务处理过程里读取了另一个未提交的事务中的数据。</p>
+<p>不可重复读是指在对于数据库中的某个数据，一个事务范围内多次查询却返回了不同的数据值，这是由于在查询间隔，被另一个事务修改并提交了。</p>
+<p>幻读是事务非独立执行时发生的一种现象。例如事务T1读取一条指定where条件的语句，返回结果集。此时事务T2插入一行新记录，恰好满足T1的where条件。然后T1使用相同的条件再次查询，结果集中可以看到T2插入的记录，这条新纪录就是幻想。</p>
+<h2 id="数据结构与算法"><a href="#数据结构与算法" class="headerlink" title="数据结构与算法"></a>数据结构与算法</h2><ol>
+<li>哈希</li>
+</ol>
+<p><strong>哈希算法</strong>：根据设定的哈希函数H（key）和处理冲突方法将一组关键字映象到一个有限的地址区间上的算法。也称为散列算法、杂凑算法。<br> <strong>哈希表</strong>：数据经过哈希算法之后得到的集合。这样关键字和数据在集合中的位置存在一定的关系，可以根据这种关系快速查询。</p>
+<p>开放定址法、链地址法（拉链法）、再哈希法</p>
+<ol start="2">
+<li>优先队列</li>
+</ol>
+<p>优先队列也是一种队列，只不过不同的是，优先队列的出队顺序是按照优先级来的；</p>
+</div><div class="tags"></div><div class="post-nav"><a class="next" href="/Janeiojbk.github.io/2020/02/29/TCP%E5%88%B0%E5%BA%95%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/">TCP到底做了什么</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://Janeiojbk.github.io"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/Janeiojbk.github.io/categories/%E9%9A%8F%E7%AC%94/">随笔</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/Janeiojbk.github.io/tags/%E6%84%9F%E6%82%9F/" style="font-size: 15px;">感悟</a> <a href="/Janeiojbk.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 15px;">计算机网络</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/Janeiojbk.github.io/2020/03/09/%E9%9D%A2%E8%AF%95%E9%97%AE%E9%A2%98%E6%95%B4%E7%90%86/">面试问题整理</a></li><li class="post-list-item"><a class="post-list-link" href="/Janeiojbk.github.io/2020/02/29/TCP%E5%88%B0%E5%BA%95%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/">TCP到底做了什么</a></li><li class="post-list-item"><a class="post-list-link" href="/Janeiojbk.github.io/2020/02/28/%E6%80%9D%E5%89%8D%E6%83%B3%E5%90%8E%EF%BC%8C%E4%B8%8D%E5%A6%82%E4%B8%8D%E7%AE%A1%E4%B8%8D%E9%A1%BE/">思前想后，不如不管不顾</a></li><li class="post-list-item"><a class="post-list-link" href="/Janeiojbk.github.io/2020/02/28/%E5%86%99%E5%8D%9A%E5%AE%A2%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/">写博客的重要性</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="https://google.com/" title="Google" target="_blank">Google</a><ul></ul><a href="https://stackoverflow.com/" title="StackOverflow" target="_blank">StackOverflow</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2020 <a href="/Janeiojbk.github.io/." rel="nofollow">诗酒趁年华.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/Janeiojbk.github.io/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/Janeiojbk.github.io/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css"><script type="text/javascript" src="/Janeiojbk.github.io/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/Janeiojbk.github.io/js/smartresize.js?v=0.0.0"></script></div></body></html>
